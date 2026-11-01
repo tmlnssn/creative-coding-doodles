@@ -21,20 +21,30 @@
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    // Fill the whole canvas with white
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     // Find the centre of the canvas
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = 50;
+    const baseRadius = 100;
 
-    // Draw a black circle in the centre
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.fill();
+    function draw(time) {
+      // Fill the whole canvas with white (this also erases the previous frame)
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Let the radius grow and shrink over time
+      const radius = baseRadius + Math.sin(time / 500) * 10;
+
+      // Draw the circle in the centre
+      ctx.fillStyle = "black";
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ask the browser to call draw again for the next frame
+      requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
   </script>
 </body>
 </html>
