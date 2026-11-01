@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Draaiende cirkels</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #1e1e1e;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    canvas {
+      background: #fff;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="grid"></canvas>
+
+  <script>
+    // ---- Instellingen -------------------------------------------------
+    const CONFIG = {
+      rows: 6,
+      cols: 6,
+      color: '#d9d9d9',
+      gapRatio: 0.18,      // ruimte tussen cirkels t.o.v. celgrootte
+      paddingRatio: 0.04,  // witrand rond het grid t.o.v. canvasgrootte
+      rotateMs: 700,       // duur van één kwartslag
+      pauseMs: 900,        // stilstand na iedere 90 graden
+    };
+
+    const QUARTER = Math.PI / 2;
+
+    // ---- Canvas -------------------------------------------------------
+    const canvas = document.getElementById('grid');
+    const ctx = canvas.getContext('2d');
+    let size = 0;
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+      canvas.style.width = size + 'px';
+      canvas.style.height = size + 'px';
+      canvas.width = Math.round(size * dpr);
+      canvas.height = Math.round(size * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    // ---- Cirkels ------------------------------------------------------
+    // Elke cirkel mist één kwart. In de beginstand wijst het ontbrekende
+    // kwart naar het midden van zijn 2x2-blok, zodat er witte vierkanten
+    // ontstaan. Kwadranten (canvas, met de klok mee vanaf rechts):
+    // 0 = rechtsonder, 1 = linksonder, 2 = linksboven, 3 = rechtsboven.
+    function startQuadrant(row, col) {
+      const oddRow = row % 2 === 1;
+      const oddCol = col % 2 === 1;
+      if (!oddRow && !oddCol) return 0;
+      if (!oddRow && oddCol) return 1;
+      if (oddRow && oddCol) return 2;
+      return 3;
+    }
+
+    const circles = [];
+    for (let row = 0; row < CONFIG.rows; row++) {
+      for (let col = 0; col < CONFIG.cols; col++) {
+        circles.push({ row, col, baseAngle: startQuadrant(row, col) * QUARTER });
+      }
+    }
+
+    function drawCircle(cx, cy, radius, missingStart) {
+      // Teken de 3/4 cirkel: alles behalve het kwart [missingStart, missingStart + 90°]
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, missingStart + QUARTER, missingStart + 4 * QUARTER);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function draw(rotation) {
+      ctx.clearRect(0, 0, size, size);
+      ctx.fillStyle = CONFIG.color;
+
+      const padding = size * CONFIG.paddingRatio;
+      const cell = (size - padding * 2) / Math.max(CONFIG.rows, CONFIG.cols);
+      const radius = (cell * (1 - CONFIG.gapRatio)) / 2;
+
+      for (const c of circles) {
+        const cx = padding + c.col * cell + cell / 2;
+        const cy = padding + c.row * cell + cell / 2;
+        drawCircle(cx, cy, radius, c.baseAngle + rotation);
+      }
+    }
+
+    // ---- Animatie -----------------------------------------------------
+    // Eén cyclus = draaien + stilstaan. Na elke cyclus staat het grid
+    // een kwartslag verder; na vier cycli is het weer bij de beginstand.
+    const easeInOutCubic = t =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    function rotationAt(elapsed) {
+      const cycle = CONFIG.pauseMs + CONFIG.rotateMs;
+      const step = Math.floor(elapsed / cycle) % 4;
+      const t = elapsed % cycle;
+
+      // Eerst stilstaan, daarna draaien naar de volgende stand
+      const progress = t < CONFIG.pauseMs
+        ? 0
+        : easeInOutCubic((t - CONFIG.pauseMs) / CONFIG.rotateMs);
+
+      return (step + progress) * QUARTER;
+    }
+
+    let startTime = null;
+    function frame(now) {
+      if (startTime === null) startTime = now;
+      draw(rotationAt(now - startTime));
+      requestAnimationFrame(frame);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
