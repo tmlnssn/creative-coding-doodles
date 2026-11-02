@@ -33,8 +33,19 @@
     // Resize the canvas again whenever the window changes size
     window.addEventListener("resize", resizeCanvas);
 
-    // Base radius of the circle
-    const baseRadius = 200;
+    // Base radius of the shape 
+    const baseRadius = 70;
+
+    // Create random positions for the shapes, only once
+    const shapeCount = 30;
+    const positions = [];
+
+    for (let i = 0; i < shapeCount; i++) {
+      positions.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height
+      });
+    }
 
     function draw(time) {
       // Fill the whole canvas with white (this also erases the previous frame)
@@ -44,20 +55,24 @@
       // Let the radius grow and shrink over time
       const radius = baseRadius + Math.sin(time / 500) * 10;
 
-      // Draw the circle in the centre
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
       const size = radius * 2;
-      
+
       // Let the corners change between sharp (square) and round (circle)
       const roundness = (Math.sin(time / 500) + 1) / 2;
       const cornerRadius = radius * roundness;
-
+      
+      // Draw one shape at every position in the list
       ctx.fillStyle = "black";
-      ctx.beginPath();
-      ctx.roundRect(centerX - radius, centerY - radius, size, size, cornerRadius);
-      ctx.fill();
 
+      for (let i = 0; i < positions.length; i++) {
+        const centerX = positions[i].x;
+        const centerY = positions[i].y;
+
+        ctx.beginPath();
+        ctx.roundRect(centerX - radius, centerY - radius, size, size, cornerRadius);
+        ctx.fill();
+      }
+      
       // Ask the browser to call draw again for the next frame
       requestAnimationFrame(draw);
     }
