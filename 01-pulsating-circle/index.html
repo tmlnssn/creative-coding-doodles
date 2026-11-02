@@ -14,16 +14,26 @@
   </style>
 </head>
 <body>
-  <canvas id="canvas" width="400" height="400"></canvas>
+  <canvas id="canvas"></canvas>
 
   <script>
     // Get the canvas element and its 2D drawing context
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    // Find the centre of the canvas
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
+    // Make the canvas as big as the browser window
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    // Set the canvas size once when the page loads
+    resizeCanvas();
+    
+    // Resize the canvas again whenever the window changes size
+    window.addEventListener("resize", resizeCanvas);
+
+    // Base radius of the circle
     const baseRadius = 100;
 
     function draw(time) {
@@ -35,6 +45,8 @@
       const radius = baseRadius + Math.sin(time / 500) * 10;
 
       // Draw the circle in the centre
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
       ctx.fillStyle = "black";
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
