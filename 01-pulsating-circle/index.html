@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>01 – Circle</title>
+  <title>01 – Pulsating Circle</title>
   <style>
     body {
       margin: 0;
@@ -34,7 +34,7 @@
     window.addEventListener("resize", resizeCanvas);
 
     // Base radius of the circle
-    const baseRadius = 100;
+    const baseRadius = 200;
 
     function draw(time) {
       // Fill the whole canvas with white (this also erases the previous frame)
@@ -47,9 +47,15 @@
       // Draw the circle in the centre
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
+      const size = radius * 2;
+      
+      // Let the corners change between sharp (square) and round (circle)
+      const roundness = (Math.sin(time / 500) + 1) / 2;
+      const cornerRadius = radius * roundness;
+
       ctx.fillStyle = "black";
       ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.roundRect(centerX - radius, centerY - radius, size, size, cornerRadius);
       ctx.fill();
 
       // Ask the browser to call draw again for the next frame
