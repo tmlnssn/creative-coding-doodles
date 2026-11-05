@@ -16,18 +16,19 @@
     // Set the background color to black
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Set the font properties when drawing the letter "A" in white
+
+    // Set the font properties when drawing the letter "A"
     ctx.font = "bold 200px helvetica neue";
-    ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     
-    // Draw the letter "A" when the canvas is clicked
-    canvas.addEventListener("click", function(event) {
-        ctx.fillText("A", event.offsetX, event.offsetY);
+    // Draw the letter "A" on mouse move  
+    canvas.addEventListener("mousemove", function(event) {
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      ctx.fillText("A", event.offsetX, event.offsetY);
     });
-  
 
   </script>
 
