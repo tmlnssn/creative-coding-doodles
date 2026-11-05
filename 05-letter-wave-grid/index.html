@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>05 - letter wave grid</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="800"></canvas>
+
+  <script>
+    // Get the canvas element and its 2D drawing context
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    // Grid settings
+    const spacing = 80;       // distance between the letters in px
+    const maxSize = 44;       // largest letter size in px
+    const mouseRadius = 220;  // how far the mouse influence reaches in px
+
+    // Mouse position (start far away, so no letter is enlarged yet)
+    let mouseX = -1000;
+    let mouseY = -1000;
+
+    // Remember where the mouse is
+    canvas.addEventListener("mousemove", function(event) {
+      mouseX = event.offsetX;
+      mouseY = event.offsetY;
+    });
+
+    // Move the mouse "far away" again when it leaves the canvas
+    canvas.addEventListener("mouseleave", function() {
+      mouseX = -1000;
+      mouseY = -1000;
+    });
+
+    // Draw one frame of the animation
+    function draw(time) {
+      const seconds = time / 1000;
+
+      // Black background over the previous frame
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Letter settings
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `bold ${maxSize}px "Arial Rounded MT Bold", sans-serif`;
+
+      // Walk through the grid: columns (x) and rows (y)
+      for (let x = spacing / 2; x < canvas.width; x += spacing) {
+        for (let y = spacing / 2; y < canvas.height; y += spacing) {
+
+          // Wave: a number between 0 and 1 that slowly moves across the grid
+          const wave = (Math.sin(x * 0.006 + seconds) + Math.sin(y * 0.009 - seconds * 0.7) + 2) / 4;
+
+          // Mouse: 1 right under the mouse, 0 at mouseRadius or further away
+          const distance = Math.hypot(x - mouseX, y - mouseY);
+          const mouse = Math.max(0, 1 - distance / mouseRadius);
+
+          // Combine wave and mouse into one scale between 0 and 1
+          const scale = Math.min(1, wave * wave * 0.8 + mouse);
+
+          // Draw the letter at its grid position, scaled smoothly
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.scale(scale, scale);
+          ctx.fillText("TIM", 0, 0);
+          ctx.restore();
+        }
+      }
+
+      // Ask the browser to draw the next frame
+      requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
