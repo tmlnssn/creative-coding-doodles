@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>04 - letter A</title>
+</head>
+<body>
+ <canvas id="canvas" width="400" height="400"></canvas>
+
+  <script>
+    // Get the canvas element and its 2D drawing context
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    // Set the background color to black
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Set the font properties and draw the letter "A" in white
+    ctx.font = "bold 200px helvetica neue";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("A", canvas.width / 2, canvas.height / 2);
+
+  </script>
+
+</body>
+</html>
